@@ -28,3 +28,8 @@ READY-TO-GO DATASET OPTION:
 - In HHSRS, click “Import dataset” and upload your old HHSRS HTML file.
 - The app will automatically extract HAZARD_STATS and save it locally on that device.
 - Use “Reset dataset” to revert.
+
+
+HHSRS PROFILE DEFAULTS (ANNEX D 2006):
+- Built-in hazard profile defaults are now based on the UK Government HHSRS Operating Guidance (Feb 2006), Annex D.
+- A copy of the dataset is included at /public/hhsrs_hazard_stats_annexd_2006.json.

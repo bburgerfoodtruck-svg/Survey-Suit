@@ -1,8 +1,4 @@
-// Auto-generated from ODPM (UK Government) HHSRS Operating Guidance (February 2006), Annex D tables.
-// Source PDF: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/15810/142631.pdf
-// Extracted programmatically for consistent profile defaults (likelihood + outcome spread) by dwelling type & age.
-
-export const DEFAULT_HAZARD_STATS = {
+{
   "1": {
     "name": "Damp and mould growth",
     "profiles": [
@@ -1684,4 +1680,4 @@ export const DEFAULT_HAZARD_STATS = {
       }
     ]
   }
-};
+}
