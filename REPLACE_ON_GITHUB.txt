@@ -30,6 +30,7 @@ READY-TO-GO DATASET OPTION:
 - Use “Reset dataset” to revert.
 
 
-HHSRS PROFILE DEFAULTS (ANNEX D 2006):
-- Built-in hazard profile defaults are now based on the UK Government HHSRS Operating Guidance (Feb 2006), Annex D.
-- A copy of the dataset is included at /public/hhsrs_hazard_stats_annexd_2006.json.
+v1.2 upgrades:
+- Added Property age band + Property type selectors in HHSRS.
+- Auto-selects the closest profile per hazard (when the dataset includes matching segment labels).
+- Generate-all hazards now uses the selected age/type profiles.

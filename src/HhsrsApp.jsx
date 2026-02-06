@@ -97,6 +97,13 @@ const [hazardStats, setHazardStats] = useState(() => {
   const [surveyDate, setSurveyDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [surveyor, setSurveyor] = useState("");
 
+// Property profile selectors (drives default profile choice when available in dataset)
+const AGE_OPTIONS = ["All dwellings", "Pre 1920", "1920-1945", "1946-1979", "Post 1979"];
+const TYPE_OPTIONS = ["All", "Non HMO", "HMO", "House", "Flat"];
+
+const [propertyAgeBand, setPropertyAgeBand] = useState(() => settings.propertyAgeBand || "All dwellings");
+const [propertyTypeBand, setPropertyTypeBand] = useState(() => settings.propertyTypeBand || "All");
+
   const [items, setItems] = useState("");
   const [justification, setJustification] = useState("");
 
@@ -125,17 +132,55 @@ const [hazardStats, setHazardStats] = useState(() => {
     setAddress(settings.address || "");
     setSurveyDate(settings.surveyDate || new Date().toISOString().slice(0, 10));
     setSurveyor(settings.surveyor || "");
+    setPropertyAgeBand(settings.propertyAgeBand || "All dwellings");
+    setPropertyTypeBand(settings.propertyTypeBand || "All");
   }, []); // eslint-disable-line
 
-  // when hazard changes, reset profile index to all dwellings and apply profile defaults
+
+function bestProfileIndex(hzObj) {
+  if (!hzObj?.profiles?.length) return 0;
+  const age = String(propertyAgeBand || "All dwellings").toLowerCase();
+  const typ = String(propertyTypeBand || "All").toLowerCase();
+
+  // Try exact match including age + type keywords in segment text
+  const idx = hzObj.profiles.findIndex((p) => {
+    const seg = String(p.segment || "").toLowerCase();
+    const ageOk = age === "all dwellings" ? true : seg.includes(age.toLowerCase());
+    const typeOk = typ === "all" ? true : seg.includes(typ);
+    return ageOk && typeOk;
+  });
+  if (idx >= 0) return idx;
+
+  // Try age only
+  if (age !== "all dwellings") {
+    const idxAge = hzObj.profiles.findIndex((p) => String(p.segment || "").toLowerCase().includes(age));
+    if (idxAge >= 0) return idxAge;
+  }
+
+  // Fallback to “All dwellings” if present
+  return defaultProfileIndex(hzObj);
+}
+
+// when hazard changes, auto-select best profile for the chosen property age/type
   useEffect(() => {
     const hzNew = hazardStats[hazardNo];
     if (!hzNew) return;
-    const idx = defaultProfileIndex(hzNew);
+        const idx = bestProfileIndex(hzNew);
     setProfileIdx(idx);
   }, [hazardNo]);
 
-  // apply profile
+  
+// auto-select best profile when property age/type changes (if dataset supports it)
+useEffect(() => {
+  const hzNow = hazardStats[hazardNo];
+  if (!hzNow) return;
+  const idx = bestProfileIndex(hzNow);
+  setProfileIdx(idx);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [propertyAgeBand, propertyTypeBand]);
+
+
+// apply profile
   useEffect(() => {
     const hzNow = hazardStats[hazardNo];
     if (!hzNow) return;
@@ -150,6 +195,8 @@ const [hazardStats, setHazardStats] = useState(() => {
   function captureMetaToSettings() {
     setSettings((s) => ({
       ...s,
+      propertyAgeBand,
+      propertyTypeBand,
       clientName,
       propertyRef,
       address,
@@ -271,7 +318,7 @@ const [hazardStats, setHazardStats] = useState(() => {
 
     const newReport = hazardKeys.map((hNo) => {
       const hz = hazardStats[hNo];
-      const pIdx = defaultProfileIndex(hz);
+            const pIdx = bestProfileIndex(hz);
       const p = hz.profiles[pIdx];
       const { total, c4 } = computeScore(Number(p.likelihood), Number(p.classI), Number(p.classII), Number(p.classIII));
       const score = Math.round(total);
@@ -755,6 +802,32 @@ function resetDataset() {
         </div>
       </div>
 
+<div className="row">
+  <div className="field" style={{ gridColumn: "span 6" }}>
+    <label>Property age band (for defaults)</label>
+    <select value={propertyAgeBand} onChange={(e) => setPropertyAgeBand(e.target.value)}>
+      {AGE_OPTIONS.map((o) => (
+        <option key={o} value={o}>
+          {o}
+        </option>
+      ))}
+    </select>
+    <div className="small">Used to auto-select the closest Annex D-style profile when your dataset contains age/type segments.</div>
+  </div>
+  <div className="field" style={{ gridColumn: "span 6" }}>
+    <label>Property type (for defaults)</label>
+    <select value={propertyTypeBand} onChange={(e) => setPropertyTypeBand(e.target.value)}>
+      {TYPE_OPTIONS.map((o) => (
+        <option key={o} value={o}>
+          {o}
+        </option>
+      ))}
+    </select>
+    <div className="small">Example: Non HMO / HMO or House / Flat (depends on what the hazard dataset includes).</div>
+  </div>
+</div>
+
+
       <div className="row">
         <div className="field" style={{ gridColumn: "span 6" }}>
           <label>Items / deficiencies (for this hazard)</label>
@@ -848,6 +921,9 @@ function resetDataset() {
       <div className="hr" />
 
       <label>Standards / legal & statutory guidance (reference)</label>
+      <div className="small" style={{ marginTop: 6 }}>
+        Source for defaults (when dataset supports it): HHSRS Operating Guidance (2006) Annex D statistical averages.
+      </div>
       <div className="pill" style={{ width: "100%", display: "block", padding: "10px 12px" }}>
         {HHSRS_STANDARD_TEXT}
       </div>
