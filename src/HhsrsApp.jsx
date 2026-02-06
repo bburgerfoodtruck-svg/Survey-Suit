@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import jsPDF from "jspdf";
-import { DEFAULT_hazardStats } from "./hhsrs/hazardStats.js";
+import { DEFAULT_HAZARD_STATS } from "./hhsrs/hazardStats.js";
 import { HHSRS_STANDARD_TEXT, getLegalRefs, LIKELIHOOD_POINTS } from "./hhsrs/legalRefs.js";
 
 const LS_KEY_REPORT = "hhsrs_report_1_29_v1_1";
@@ -64,7 +64,7 @@ const [hazardStats, setHazardStats] = useState(() => {
       if (parsed && typeof parsed === "object") return parsed;
     }
   } catch {}
-  return DEFAULT_hazardStats;
+  return DEFAULT_HAZARD_STATS;
 });
 
   const hazardKeys = useMemo(() => Object.keys(hazardStats).sort((a, b) => Number(a) - Number(b)), []);
