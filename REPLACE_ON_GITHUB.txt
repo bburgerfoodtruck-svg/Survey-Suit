@@ -34,3 +34,8 @@ v1.2 upgrades:
 - Added Property age band + Property type selectors in HHSRS.
 - Auto-selects the closest profile per hazard (when the dataset includes matching segment labels).
 - Generate-all hazards now uses the selected age/type profiles.
+
+
+v1.2.1 fix:
+- Property age/type selectors now react instantly (including after importing a dataset).
+- Added a visible 'Auto-selected profile' / fallback message so users know what default was applied.
