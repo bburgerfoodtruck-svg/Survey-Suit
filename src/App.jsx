@@ -107,7 +107,7 @@ export default function App() {
 
       <div style={{ height: 16 }} />
       <div className="small" style={{ textAlign: "center", opacity: 0.85 }}>
-        Survey Suite • v1.2.1 • Switch surveys from the home screen • Theme: {theme}
+        Survey Suite • v1.1 • Switch surveys from the home screen • Theme: {theme}
       </div>
     </div>
   );
