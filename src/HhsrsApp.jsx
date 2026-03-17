@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import { DEFAULT_HAZARD_STATS } from "./hhsrs/hazardStats.js";
 import { HHSRS_STANDARD_TEXT, getLegalRefs, LIKELIHOOD_POINTS } from "./hhsrs/legalRefs.js";
+const GLOBALS_KEY = "survey_suite_globals_v1";
+function loadGlobals(){ try { return JSON.parse(localStorage.getItem(GLOBALS_KEY) || "{}") || {}; } catch { return {}; } }
 
 const LS_KEY_REPORT = "hhsrs_report_1_29_v1_1";
 const LS_KEY_SETTINGS = "hhsrs_settings_1_29_v1_1";
@@ -55,6 +57,7 @@ function downloadBlob(filename, blob) {
 }
 
 export default function HhsrsApp({ headerRight }) {
+  const globals = loadGlobals();
 
 const [hazardStats, setHazardStats] = useState(() => {
   try {
